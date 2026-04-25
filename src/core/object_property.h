@@ -42,6 +42,8 @@ struct id_property_t {
     static const xstring kingdom;
     static const xstring fertility;
     static const xstring capacity;
+    static const xstring water_stored;
+    static const xstring max_water_storage;
 };
 
 const id_property_t &tags();

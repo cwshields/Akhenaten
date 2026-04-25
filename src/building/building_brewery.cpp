@@ -7,8 +7,11 @@
 #include "city/city_resource.h"
 #include "city/city_warnings.h"
 #include "city/city_resource_handle.h"
+#include "core/object_property.h"
 #include "empire/empire.h"
+#include "game/game.h"
 #include "game/game_config.h"
+#include "game/simulation_time.h"
 #include "grid/terrain.h"
 #include "io/io_buffer.h"
 #include "figure/service.h"
@@ -78,9 +81,11 @@ void building_brewery::on_place_checks() {
 
 void building_brewery::on_create(int orientation) {
     building_industry::on_create(orientation);
-    
+
     if (!!game_features::gameplay_brewery_requires_water) {
-        set_water_stored(0);
+        const bool can_check = base.tile.valid() && base.size > 0;
+        const bool start_full = can_check && has_water_access();
+        set_water_stored(start_full ? current_params().max_water_storage : 0);
     }
 }
 
@@ -165,20 +170,43 @@ bool building_brewery::has_water_access() const {
            map_terrain_exists_tile_in_radius_with_type(base.tile, base.size, 3, TERRAIN_FLOODPLAIN);
 }
 
+bvariant building_brewery::get_property(const xstring &domain, const xstring &name) const {
+    if (domain == tags().building && base.is_valid()) {
+        if (name == tags().water_stored) {
+            return bvariant(water_stored());
+        }
+        if (name == tags().max_water_storage) {
+            return bvariant(int(current_params().max_water_storage));
+        }
+    }
+
+    return building_industry::get_property(domain, name);
+}
+
 void building_brewery::update_water_supply() {
     if (!game_features::gameplay_brewery_requires_water) {
         return;
     }
-    
+
+    if (!base.is_valid() || !base.tile.valid() || base.size <= 0) {
+        return;
+    }
+
     int current_water = water_stored();
     if (current_water >= current_params().max_water_storage) {
         return;
     }
-    
-    // Slow water replenishment from nearby well (TERRAIN_FOUNTAIN_RANGE)
-    if (!map_terrain_exists_tile_in_area_with_type(base.tile, base.size, TERRAIN_FOUNTAIN_RANGE)) {
+
+    auto &d = runtime_data();
+    const uint8_t current_month = game.simtime.month;
+    if (d.unk_b[2] >= simulation_time_t::months_in_year || d.unk_b[2] != current_month) {
+        d.unk_b[1] = has_water_access() ? 1 : 0;
+        d.unk_b[2] = current_month;
+    }
+
+    if (!d.unk_b[1]) {
         return;
     }
-    
+
     set_water_stored(current_water + 1);
 }

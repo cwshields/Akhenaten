@@ -13,7 +13,7 @@ function workshop_info_window_toggle_mothball() {
 }
 
 workshop_info_window {
-    related_buildings [BUILDING_BREWERY_WORKSHOP, BUILDING_POTTERY_WORKSHOP
+    related_buildings [BUILDING_POTTERY_WORKSHOP
                        BUILDING_PAPYRUS_WORKSHOP, BUILDING_CHARIOTS_WORKSHOP, BUILDING_CATTLE_RANCH
                        BUILDING_LAMP_WORKSHOP, BUILDING_PAINT_WORKSHOP, BUILDING_WEAPONSMITH, BUILDING_JEWELS_WORKSHOP]
     ui {
@@ -37,6 +37,16 @@ workshop_info_window {
                                 onclick: workshop_info_window_toggle_mothball
                                })
     }
+}
+
+brewery_info_window {
+    related_buildings [BUILDING_BREWERY_WORKSHOP]
+    ui : baseui(workshop_info_window, {
+        background    : outer_panel({size[29, 18] })
+
+        water_label   : label({pos[32, 230], font:FONT_NORMAL_BLACK_ON_LIGHT, text:"#TR_BUILDING_BREWERY_WATER" })
+        water_text    : text({pos[100, 230], size[px(27), 20], text:"${building.water_stored} / ${building.max_water_storage}", font:FONT_NORMAL_BLACK_ON_LIGHT })
+    })
 }
 
 brickworks_info_window {

@@ -43,3 +43,5 @@ const xstring id_property_t::monument = "monument";
 const xstring id_property_t::kingdom = "kingdom";
 const xstring id_property_t::fertility = "fertility";
 const xstring id_property_t::capacity = "capacity";
+const xstring id_property_t::water_stored = "water_stored";
+const xstring id_property_t::max_water_storage = "max_water_storage";

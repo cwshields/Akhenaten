@@ -23,7 +23,8 @@ public:
     virtual void production_started() override;
     virtual void bind_dynamic(io_buffer *iob, size_t version) override;
     virtual void on_create(int orientation) override;
-    
+    virtual bvariant get_property(const xstring &domain, const xstring &name) const override;
+
     void update_water_supply();
     bool has_water_access() const;
     int water_stored() const { return runtime_data().unk_b[0]; }
